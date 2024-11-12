@@ -34,7 +34,7 @@ if user_input:
             max_tokens=100
         )
         # Obtener la respuesta del bot
-        bot_response = response.choices[0].message["content"].strip()
+        bot_response = response.choices[0].message.content.strip()
         # Agregar la respuesta del bot al historial
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
