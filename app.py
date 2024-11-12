@@ -15,12 +15,12 @@ for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f"**Tú:** {msg['content']}")
     else:
-        st.markdown(f"**Meiva Bot:** {msg['content']}")
+        st.markdown(f"**Meiva Bot:** {msg['content']}")  # Cambiado a Meiva Bot
 
 # Entrada de usuario
 user_input = st.text_input("Escribe tu pregunta:", key="user_input")
 
-if user_input:
+if st.button("Enviar") and user_input:
     # Agregar la pregunta del usuario al historial
     st.session_state.messages.append({"role": "user", "content": user_input})
     
@@ -36,10 +36,10 @@ if user_input:
         # Agregar la respuesta del bot al historial
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
         
-        # Mostrar la respuesta
-        st.markdown(f"**Bot:** {bot_response}")
+        # Mostrar la respuesta con el nombre personalizado
+        st.markdown(f"**Meiva Bot:** {bot_response}")
 
-        # Limpiar el campo de entrada de usuario para permitir una nueva pregunta
-        st.experimental_rerun()
+        # Limpiar la entrada de texto para que el usuario pueda seguir preguntando
+        st.session_state["user_input"] = ""  # Esto solo limpia la entrada visualmente en Streamlit
     except Exception as e:
         st.error(f"Ocurrió un error: {e}")
