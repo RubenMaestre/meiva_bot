@@ -1,23 +1,23 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 
 # Configuración de la API de OpenAI usando st.secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("Chat con el Bot de Meiva Shoes")
 
 # Estado para mantener el historial de la conversación
 if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "assistant", "content": "¡Hola! Soy el bot de Meiva Shoes. ¿En qué puedo ayudarte?"}
-    ]
+    st.session_state.messages = []
 
 # Mostrar el historial de la conversación
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+for msg in st.session_state.messages:
+    role = msg["role"]
+    content = msg["content"]
+    with st.chat_message(role):
+        st.markdown(content)
 
-# Obtener la entrada del usuario
+# Entrada de usuario
 user_input = st.chat_input("Escribe tu pregunta:")
 
 if user_input:
@@ -25,10 +25,10 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
-
+    
     try:
         # Realizar la consulta al modelo
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=st.secrets["FINE_TUNING_MODEL_ID"],
             messages=st.session_state.messages,
             max_tokens=100
