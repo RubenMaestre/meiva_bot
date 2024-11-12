@@ -15,30 +15,31 @@ for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f"**Tú:** {msg['content']}")
     else:
-        st.markdown(f"**Bot:** {msg['content']}")
+        st.markdown(f"**Meiva Bot:** {msg['content']}")
 
 # Entrada de usuario
-user_input = st.text_input("Escribe tu pregunta:")
+user_input = st.text_input("Escribe tu pregunta:", key="user_input")
 
-if st.button("Enviar"):
-    if user_input:
-        # Agregar la pregunta del usuario al historial
-        st.session_state.messages.append({"role": "user", "content": user_input})
+if user_input:
+    # Agregar la pregunta del usuario al historial
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    try:
+        # Realizar la consulta al modelo
+        response = client.chat.completions.create(
+            model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
+            messages=st.session_state.messages,
+            max_tokens=100
+        )
+        # Obtener la respuesta del bot
+        bot_response = response.choices[0].message.content
+        # Agregar la respuesta del bot al historial
+        st.session_state.messages.append({"role": "assistant", "content": bot_response})
         
-        try:
-            # Realizar la consulta al modelo
-            response = client.chat.completions.create(
-                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
-                messages=st.session_state.messages,
-                max_tokens=100
-            )
-            # Obtener la respuesta del bot
-            bot_response = response.choices[0].message.content
-            # Agregar la respuesta del bot al historial
-            st.session_state.messages.append({"role": "assistant", "content": bot_response})
-            # Mostrar la respuesta
-            st.markdown(f"**Bot:** {bot_response}")
-        except Exception as e:
-            st.error(f"Ocurrió un error: {e}")
-    else:
-        st.warning("Por favor, escribe algo para enviar.")
+        # Mostrar la respuesta
+        st.markdown(f"**Bot:** {bot_response}")
+
+        # Limpiar el campo de entrada de usuario para permitir una nueva pregunta
+        st.experimental_rerun()
+    except Exception as e:
+        st.error(f"Ocurrió un error: {e}")
