@@ -20,31 +20,31 @@ for msg in st.session_state.messages:
 # Divisor para separar el historial de la barra de entrada
 st.write("---")
 
-# Entrada de usuario en un contenedor
-input_container = st.container()
+# Contenedor para manejar la entrada de usuario
+input_container = st.empty()
 with input_container:
-    # Entrada de usuario
     user_input = st.text_input("Escribe tu pregunta:", key="input", label_visibility="collapsed")
 
-    # Botón de envío
-    if st.button("Enviar"):
-        if user_input:
-            # Agregar la pregunta del usuario al historial
-            st.session_state.messages.append({"role": "user", "content": user_input})
-            
-            try:
-                # Realizar la consulta al modelo
-                response = client.chat.completions.create(
-                    model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
-                    messages=st.session_state.messages,
-                    max_tokens=100
-                )
-                # Obtener la respuesta del bot
-                bot_response = response.choices[0].message.content
-                # Agregar la respuesta del bot al historial
-                st.session_state.messages.append({"role": "assistant", "content": bot_response})
-            except Exception as e:
-                st.error(f"Ocurrió un error: {e}")
-            
-            # Limpiar la entrada de texto estableciendo un valor vacío
-            st.session_state["input"] = ""
+# Botón de envío
+if st.button("Enviar"):
+    if user_input:
+        # Agregar la pregunta del usuario al historial
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        
+        try:
+            # Realizar la consulta al modelo
+            response = client.chat.completions.create(
+                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
+                messages=st.session_state.messages,
+                max_tokens=100
+            )
+            # Obtener la respuesta del bot
+            bot_response = response.choices[0].message.content
+            # Agregar la respuesta del bot al historial
+            st.session_state.messages.append({"role": "assistant", "content": bot_response})
+        except Exception as e:
+            st.error(f"Ocurrió un error: {e}")
+        
+        # Limpiar la entrada de texto forzando el redibujado
+        input_container.empty()
+        st.experimental_rerun()
