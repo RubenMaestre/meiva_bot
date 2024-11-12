@@ -8,18 +8,16 @@ st.title("Chat con el Bot de Meiva Shoes")
 
 # Estado para mantener el historial de la conversación
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "assistant", "content": "¡Hola! Soy el bot de Meiva Shoes. ¿En qué puedo ayudarte?"}
+    ]
 
 # Mostrar el historial de la conversación
-for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        with st.chat_message("user"):
-            st.markdown(msg["content"])
-    else:
-        with st.chat_message("assistant"):
-            st.markdown(msg["content"])
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# Entrada de usuario
+# Obtener la entrada del usuario
 user_input = st.chat_input("Escribe tu pregunta:")
 
 if user_input:
@@ -27,7 +25,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
-    
+
     try:
         # Realizar la consulta al modelo
         response = openai.ChatCompletion.create(
@@ -36,7 +34,7 @@ if user_input:
             max_tokens=100
         )
         # Obtener la respuesta del bot
-        bot_response = response.choices[0].message["content"]
+        bot_response = response.choices[0].message["content"].strip()
         # Agregar la respuesta del bot al historial
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
