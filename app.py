@@ -10,8 +10,20 @@ st.title("Chat con el Bot de Meiva Shoes")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Mostrar el historial de la conversación (orden invertido para mostrar de forma natural hacia abajo)
+for msg in reversed(st.session_state.messages):
+    if msg["role"] == "user":
+        st.markdown(f"**Tú:** {msg['content']}")
+    else:
+        st.markdown(f"**Meiva Bot:** {msg['content']}")
+
+# Coloca la barra de entrada al final de la página
+st.write("---")  # Añade una separación visual
+
 # Entrada de usuario
-user_input = st.text_input("Escribe tu pregunta:", key="user_input")
+placeholder = st.empty()  # Contenedor para manejar la posición de la entrada de usuario
+with placeholder:
+    user_input = st.text_input("Escribe tu pregunta:", key="user_input")
 
 if st.button("Enviar") and user_input:
     # Agregar la pregunta del usuario al historial
@@ -30,10 +42,7 @@ if st.button("Enviar") and user_input:
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
     except Exception as e:
         st.error(f"Ocurrió un error: {e}")
-
-# Mostrar el historial de la conversación (hacia arriba)
-for msg in reversed(st.session_state.messages):  # Invertimos el orden para mostrar el historial hacia arriba
-    if msg["role"] == "user":
-        st.markdown(f"**Tú:** {msg['content']}")
-    else:
-        st.markdown(f"**Meiva Bot:** {msg['content']}")
+    
+    # Limpiar la entrada de usuario después de enviar la pregunta
+    placeholder.empty()  # Borra el contenedor temporalmente
+    user_input = ""  # Restablece el valor de user_input
