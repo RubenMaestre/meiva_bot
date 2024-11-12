@@ -20,7 +20,7 @@ for msg in st.session_state.messages:
 # Divisor para separar el historial de la barra de entrada
 st.write("---")
 
-# Usar un contenedor en la parte inferior para la entrada de texto y el botón de envío
+# Entrada de usuario en un contenedor
 input_container = st.container()
 with input_container:
     # Entrada de usuario
@@ -46,5 +46,5 @@ with input_container:
             except Exception as e:
                 st.error(f"Ocurrió un error: {e}")
             
-            # Limpiar la entrada de texto después de enviar la pregunta
-            st.experimental_rerun()
+            # Limpiar la entrada de texto estableciendo un valor vacío
+            st.session_state["input"] = ""
