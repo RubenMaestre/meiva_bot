@@ -10,22 +10,19 @@ st.title("Chat con el Bot de Meiva Shoes")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Mostrar el historial de la conversación (de arriba hacia abajo)
-for msg in st.session_state.messages:
+# Mostrar el historial de la conversación (orden invertido para mostrar de forma natural hacia abajo)
+for msg in reversed(st.session_state.messages):
     if msg["role"] == "user":
         st.markdown(f"**Tú:** {msg['content']}")
     else:
         st.markdown(f"**Meiva Bot:** {msg['content']}")
 
-# Divisor para separar el historial de la barra de entrada
-st.write("---")
+# Coloca la barra de entrada al final de la página
+st.write("---")  # Añade una separación visual
 
-# Contenedor para manejar la entrada de usuario
-input_container = st.empty()
-with input_container:
-    user_input = st.text_input("Escribe tu pregunta:", key="input", label_visibility="collapsed")
+# Manejo del campo de entrada de texto
+user_input = st.text_input("Escribe tu pregunta:", key="input")
 
-# Botón de envío
 if st.button("Enviar"):
     if user_input:
         # Agregar la pregunta del usuario al historial
@@ -45,6 +42,5 @@ if st.button("Enviar"):
         except Exception as e:
             st.error(f"Ocurrió un error: {e}")
         
-        # Limpiar la entrada de texto forzando el redibujado
-        input_container.empty()
-        st.experimental_rerun()
+        # Restablecer el valor de la entrada de texto (borrar la entrada después de enviar)
+        st.experimental_set_query_params(user_input="")
