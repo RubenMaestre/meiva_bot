@@ -11,13 +11,11 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Mostrar el historial de la conversación en un contenedor
-chat_container = st.container()
-with chat_container:
-    for msg in st.session_state.messages:
-        if msg["role"] == "user":
-            st.markdown(f"**Tú:** {msg['content']}")
-        else:
-            st.markdown(f"**Meiva Bot:** {msg['content']}")
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f"**Tú:** {msg['content']}")
+    else:
+        st.markdown(f"**Meiva Bot:** {msg['content']}")
 
 # Agregar estilos para fijar el contenedor de entrada en la parte inferior
 st.markdown(
@@ -38,7 +36,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Contenedor fijo para la entrada y el botón
+# Contenedor fijo para la entrada de texto y el botón de envío
 st.markdown('<div class="fixed-bottom-container">', unsafe_allow_html=True)
 col1, col2 = st.columns([10, 2])  # Proporción 10:2 para el campo de entrada y el botón
 
@@ -68,5 +66,6 @@ with col2:
                 st.error(f"Ocurrió un error: {e}")
 
             # Limpiar la entrada de usuario después de enviar la pregunta
-            st.session_state["user_input"] = ""
+            st.session_state["messages"] = st.session_state.messages  # Mantener el historial actualizado
+            st.experimental_rerun()
 st.markdown('</div>', unsafe_allow_html=True)
