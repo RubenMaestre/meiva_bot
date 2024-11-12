@@ -1,8 +1,8 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 
 # Configuración de la API de OpenAI usando st.secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("Chat con el Bot de Meiva Shoes")
 
@@ -10,43 +10,36 @@ st.title("Chat con el Bot de Meiva Shoes")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Mostrar el historial de la conversación (de arriba hacia abajo)
+# Mostrar el historial de la conversación
 for msg in st.session_state.messages:
     if msg["role"] == "user":
-        st.markdown(f"**Tú:** {msg['content']}")
+        with st.chat_message("user"):
+            st.markdown(msg["content"])
     else:
-        st.markdown(f"**Meiva Bot:** {msg['content']}")
-
-# Divisor para separar el historial del campo de entrada
-st.write("---")
-
-# Crear una fila en la parte inferior de la pantalla con 1/12 de espacio
-col1, col2 = st.columns([10, 2])  # Proporción de 10:2 para entrada y botón
+        with st.chat_message("assistant"):
+            st.markdown(msg["content"])
 
 # Entrada de usuario
-with col1:
-    user_input = st.text_input("Escribe tu pregunta:", key="user_input", label_visibility="collapsed")
+user_input = st.chat_input("Escribe tu pregunta:")
 
-# Botón de envío
-with col2:
-    if st.button("Enviar"):
-        if user_input:
-            # Agregar la pregunta del usuario al historial
-            st.session_state.messages.append({"role": "user", "content": user_input})
-            
-            try:
-                # Realizar la consulta al modelo
-                response = client.chat.completions.create(
-                    model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
-                    messages=st.session_state.messages,
-                    max_tokens=100
-                )
-                # Obtener la respuesta del bot
-                bot_response = response.choices[0].message.content
-                # Agregar la respuesta del bot al historial
-                st.session_state.messages.append({"role": "assistant", "content": bot_response})
-            except Exception as e:
-                st.error(f"Ocurrió un error: {e}")
-            
-            # Limpiar la entrada de usuario después de enviar la pregunta
-            user_input = ""  # Restablecer el valor de user_input
+if user_input:
+    # Agregar la pregunta del usuario al historial
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.markdown(user_input)
+    
+    try:
+        # Realizar la consulta al modelo
+        response = openai.ChatCompletion.create(
+            model=st.secrets["FINE_TUNING_MODEL_ID"],
+            messages=st.session_state.messages,
+            max_tokens=100
+        )
+        # Obtener la respuesta del bot
+        bot_response = response.choices[0].message["content"]
+        # Agregar la respuesta del bot al historial
+        st.session_state.messages.append({"role": "assistant", "content": bot_response})
+        with st.chat_message("assistant"):
+            st.markdown(bot_response)
+    except Exception as e:
+        st.error(f"Ocurrió un error: {e}")
