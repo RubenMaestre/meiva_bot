@@ -36,7 +36,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Contenedor fijo para la entrada y el botón de envío
+# Contenedor fijo para la entrada de texto y el botón de envío
 st.markdown('<div class="fixed-bottom-container">', unsafe_allow_html=True)
 col1, col2 = st.columns([10, 2])  # Proporción 10:2 para el campo de entrada y el botón
 
@@ -70,6 +70,8 @@ if col2.button("Enviar"):
 
         # Limpiar la entrada de usuario usando una clave temporal
         st.session_state["temp_input"] = ""
+        # Rerenderizar la página inmediatamente para mostrar el historial actualizado
+        st.experimental_rerun()
 else:
     # Actualizar el valor temporal con la entrada actual
     st.session_state["temp_input"] = user_input
