@@ -13,7 +13,7 @@ if st.button("Enviar"):
     if user_input:
         try:
             response = openai.ChatCompletion.create(
-                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
+                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Asegúrate de que tu modelo sea compatible
                 messages=[
                     {"role": "user", "content": user_input}
                 ],
