@@ -46,26 +46,25 @@ with col1:
 
 # Botón de envío
 with col2:
-    if st.button("Enviar"):
-        if user_input:
-            # Agregar la pregunta del usuario al historial
-            st.session_state.messages.append({"role": "user", "content": user_input})
-            
-            try:
-                # Realizar la consulta al modelo
-                response = client.chat.completions.create(
-                    model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
-                    messages=st.session_state.messages,
-                    max_tokens=100
-                )
-                # Obtener la respuesta del bot
-                bot_response = response.choices[0].message.content
-                # Agregar la respuesta del bot al historial
-                st.session_state.messages.append({"role": "assistant", "content": bot_response})
-            except Exception as e:
-                st.error(f"Ocurrió un error: {e}")
+    send_button = st.button("Enviar")
+    
+if send_button and user_input:
+    # Agregar la pregunta del usuario al historial
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    try:
+        # Realizar la consulta al modelo
+        response = client.chat.completions.create(
+            model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
+            messages=st.session_state.messages,
+            max_tokens=100
+        )
+        # Obtener la respuesta del bot
+        bot_response = response.choices[0].message.content
+        # Agregar la respuesta del bot al historial
+        st.session_state.messages.append({"role": "assistant", "content": bot_response})
+    except Exception as e:
+        st.error(f"Ocurrió un error: {e}")
 
-            # Limpiar la entrada de usuario después de enviar la pregunta
-            st.session_state["messages"] = st.session_state.messages  # Mantener el historial actualizado
-            st.experimental_rerun()
-st.markdown('</div>', unsafe_allow_html=True)
+    # Limpiar la entrada de usuario después de enviar la pregunta
+    st.session_state["user_input"] = ""  # Restablecer el valor de user_input
