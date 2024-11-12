@@ -1,8 +1,8 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 
 # Configuración de la API de OpenAI usando st.secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("Chat con el Bot de Meiva Shoes")
 
@@ -12,8 +12,8 @@ user_input = st.text_input("Escribe tu pregunta:")
 if st.button("Enviar"):
     if user_input:
         try:
-            response = openai.ChatCompletion.create(
-                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Asegúrate de que tu modelo sea compatible
+            response = client.chat.completions.create(
+                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
                 messages=[
                     {"role": "user", "content": user_input}
                 ],
