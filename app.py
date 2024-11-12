@@ -10,7 +10,7 @@ st.title("Chat con el Bot de Meiva Shoes")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Crear un contenedor para el historial del chat que ocupa 9/10 de la pantalla
+# Mostrar el historial de la conversación en un contenedor
 chat_container = st.container()
 with chat_container:
     for msg in st.session_state.messages:
@@ -19,7 +19,7 @@ with chat_container:
         else:
             st.markdown(f"**Meiva Bot:** {msg['content']}")
 
-# Crear un contenedor fijo en la parte inferior para la entrada y el botón de envío (1/10 de la pantalla)
+# Agregar estilos para fijar el contenedor de entrada en la parte inferior
 st.markdown(
     """
     <style>
@@ -31,13 +31,14 @@ st.markdown(
         background-color: white;
         padding: 10px;
         box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Contenedor fijo para la entrada
+# Contenedor fijo para la entrada y el botón
 st.markdown('<div class="fixed-bottom-container">', unsafe_allow_html=True)
 col1, col2 = st.columns([10, 2])  # Proporción 10:2 para el campo de entrada y el botón
 
@@ -65,4 +66,7 @@ with col2:
                 st.session_state.messages.append({"role": "assistant", "content": bot_response})
             except Exception as e:
                 st.error(f"Ocurrió un error: {e}")
+
+            # Limpiar la entrada de usuario después de enviar la pregunta
+            st.session_state["user_input"] = ""
 st.markdown('</div>', unsafe_allow_html=True)
