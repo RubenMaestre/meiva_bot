@@ -4,7 +4,7 @@ import openai
 # Configuración de la API de OpenAI usando st.secrets
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-st.title("Chat con tu Bot de Fine-Tuning")
+st.title("Chat con el Bot de Meiva Shoes")
 
 # Entrada de usuario
 user_input = st.text_input("Escribe tu pregunta:")
