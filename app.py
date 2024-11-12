@@ -10,7 +10,7 @@ st.title("Chat con el Bot de Meiva Shoes")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Mostrar el historial de la conversación en un contenedor
+# Mostrar el historial de la conversación
 for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f"**Tú:** {msg['content']}")
@@ -36,35 +36,42 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Contenedor fijo para la entrada de texto y el botón de envío
+# Contenedor fijo para la entrada y el botón de envío
 st.markdown('<div class="fixed-bottom-container">', unsafe_allow_html=True)
 col1, col2 = st.columns([10, 2])  # Proporción 10:2 para el campo de entrada y el botón
 
-# Entrada de usuario
-with col1:
-    user_input = st.text_input("Escribe tu pregunta:", key="user_input", label_visibility="collapsed")
+# Entrada de usuario utilizando un valor por defecto de `st.session_state` si está definido
+user_input = col1.text_input(
+    "Escribe tu pregunta:",
+    value=st.session_state.get("temp_input", ""),  # Usamos un valor temporal para mantener la entrada
+    key="user_input",
+    label_visibility="collapsed"
+)
 
 # Botón de envío
-with col2:
-    send_button = st.button("Enviar")
-    
-if send_button and user_input:
-    # Agregar la pregunta del usuario al historial
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    
-    try:
-        # Realizar la consulta al modelo
-        response = client.chat.completions.create(
-            model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
-            messages=st.session_state.messages,
-            max_tokens=100
-        )
-        # Obtener la respuesta del bot
-        bot_response = response.choices[0].message.content
-        # Agregar la respuesta del bot al historial
-        st.session_state.messages.append({"role": "assistant", "content": bot_response})
-    except Exception as e:
-        st.error(f"Ocurrió un error: {e}")
+if col2.button("Enviar"):
+    if user_input:
+        # Agregar la pregunta del usuario al historial
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        
+        try:
+            # Realizar la consulta al modelo
+            response = client.chat.completions.create(
+                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
+                messages=st.session_state.messages,
+                max_tokens=100
+            )
+            # Obtener la respuesta del bot
+            bot_response = response.choices[0].message.content
+            # Agregar la respuesta del bot al historial
+            st.session_state.messages.append({"role": "assistant", "content": bot_response})
+        except Exception as e:
+            st.error(f"Ocurrió un error: {e}")
 
-    # Limpiar la entrada de usuario después de enviar la pregunta
-    st.session_state["user_input"] = ""  # Restablecer el valor de user_input
+        # Limpiar la entrada de usuario usando una clave temporal
+        st.session_state["temp_input"] = ""
+else:
+    # Actualizar el valor temporal con la entrada actual
+    st.session_state["temp_input"] = user_input
+
+st.markdown('</div>', unsafe_allow_html=True)
