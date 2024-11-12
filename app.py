@@ -11,11 +11,16 @@ user_input = st.text_input("Escribe tu pregunta:")
 
 if st.button("Enviar"):
     if user_input:
-        response = openai.Completion.create(
-            model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
-            prompt=user_input,
-            max_tokens=100
-        )
-        st.text_area("Respuesta del Bot:", response.choices[0].text.strip())
+        try:
+            response = openai.ChatCompletion.create(
+                model=st.secrets["FINE_TUNING_MODEL_ID"],  # Usar el ID del modelo desde secrets
+                messages=[
+                    {"role": "user", "content": user_input}
+                ],
+                max_tokens=100
+            )
+            st.text_area("Respuesta del Bot:", response.choices[0]["message"]["content"].strip())
+        except Exception as e:
+            st.error(f"Ocurrió un error: {e}")
     else:
         st.warning("Por favor, escribe algo para enviar.")
