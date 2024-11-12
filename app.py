@@ -19,7 +19,9 @@ if st.button("Enviar"):
                 ],
                 max_tokens=100
             )
-            st.text_area("Respuesta del Bot:", response.choices[0]["message"]["content"].strip())
+            # Acceso al contenido del mensaje correctamente
+            message_content = response.choices[0].message.content
+            st.text_area("Respuesta del Bot:", message_content.strip())
         except Exception as e:
             st.error(f"Ocurrió un error: {e}")
     else:
