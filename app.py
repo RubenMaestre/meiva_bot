@@ -31,7 +31,7 @@ if user_input:
         response = client.chat.completions.create(
             model=st.secrets["FINE_TUNING_MODEL_ID"],
             messages=st.session_state.messages,
-            max_tokens=100
+            max_tokens=1000
         )
         # Obtener la respuesta del bot
         bot_response = response.choices[0].message.content.strip()
