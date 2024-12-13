@@ -32,7 +32,7 @@ if user_input:
             model=st.secrets["FINE_TUNING_MODEL_ID"],
             messages=st.session_state.messages,
             max_tokens=1000,
-            temperature=0.0
+            temperature=0.3
         )
         # Obtener la respuesta del bot
         bot_response = response.choices[0].message.content.strip()
