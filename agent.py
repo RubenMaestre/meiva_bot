@@ -1,14 +1,9 @@
 from crewai import Agent, Task, Crew
-from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from config import OPENAI_MODEL, OPENAI_API_KEY
+from langchain_community.llms import Ollama  # Importamos Ollama en vez de OpenAI
+from config import OLLAMA_MODEL
 
-# Configurar API Key
-import os
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-
-# Modelo de OpenAI
-llm = ChatOpenAI(model_name=OPENAI_MODEL)
+# Instancia del modelo local con Ollama
+llm = Ollama(model=OLLAMA_MODEL)
 
 # Agente de atención al cliente
 customer_support_agent = Agent(

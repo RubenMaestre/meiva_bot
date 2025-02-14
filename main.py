@@ -1,9 +1,8 @@
 from responder import responder_cliente
 
 def chat():
-    print("🤖 Chatbot de MEIVA SHOES - Escribe 'salir' para terminar.")
+    print("🤖 Chatbot de MEIVA SHOES (Ollama) - Escribe 'salir' para terminar.")
     
-    # Mensaje de bienvenida más natural
     print("🤖 Bot: ¡Hola! Soy Marta. Bienvenido a Meiva Shoes. ¿En qué puedo ayudarte hoy?")
     
     chat_history = []
@@ -18,7 +17,6 @@ def chat():
         chat_history.append((pregunta, respuesta))
 
         print(f"🤖 Bot: {respuesta}")
-
 
 if __name__ == "__main__":
     chat()

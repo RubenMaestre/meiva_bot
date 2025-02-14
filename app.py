@@ -1,7 +1,8 @@
 import streamlit as st
 from responder import responder_cliente
+import time  # Para simular el efecto de escritura progresiva
 
-st.title("🤖 Chat con el Bot de Meiva Shoes")
+st.title("🤖 Chat con el Bot de Meiva Shoes (Ollama)")
 
 # Estado para mantener el historial de la conversación
 if "messages" not in st.session_state:
@@ -18,19 +19,26 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Escribe tu pregunta:")
 
 if user_input:
-    # Agregar la pregunta del usuario al historial
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
     try:
-        # Obtener respuesta del bot
-        bot_response = responder_cliente(user_input)
+        # Obtener la respuesta del bot en formato de streaming
+        response_stream = responder_cliente(user_input)  
 
-        # Agregar la respuesta del bot al historial
-        st.session_state.messages.append({"role": "assistant", "content": bot_response})
+        # Contenedor para mostrar la respuesta progresivamente
         with st.chat_message("assistant"):
-            st.markdown(bot_response)
+            response_container = st.empty()  
+            full_response = ""
+
+            for chunk in response_stream:
+                full_response += chunk  # Agregar el fragmento a la respuesta completa
+                response_container.markdown(full_response)  # Actualizar el texto en tiempo real
+                time.sleep(0.05)  # ⚡ Ajusta este tiempo si quieres más o menos velocidad
+
+        # Guardar la respuesta en el historial
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     except Exception as e:
         st.error(f"⚠️ Ocurrió un error: {e}")
