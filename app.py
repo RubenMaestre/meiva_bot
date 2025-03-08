@@ -8,29 +8,27 @@ st.title("🛍️ Asistente Virtual de MEIVA SHOES 👠")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Mostrar historial de mensajes
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# Input del usuario
-user_input = st.chat_input("¿En qué puedo ayudarte?")
+user_input = st.chat_input("Escribe tu pregunta:")
 
-if user_input := user_input:
+if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        message_placeholder.markdown("...")
+        message_placeholder.markdown("Pensando... 💭")
 
-        # Petición a tu API FastAPI
         response = requests.post(API_URL, json={"question": user_input})
 
-        if (response_json := response.json()).get("response"):
-            response_text = response_json["response"]  # ✅ Define response_text
-            message_placeholder.markdown(response_text)
-            st.session_state.messages.append({"role": "assistant", "content": response_text})
+        if response.ok:
+            respuesta = response.json().get("response", "Disculpa, no tengo respuesta en este momento.")
         else:
-            message_placeholder.markdown("⚠️ Lo siento, hubo un problema con la respuesta.")
+            response.raise_for_status()
+
+        message_placeholder.markdown(respuesta)
+        st.session_state.messages.append({"role": "assistant", "content": response})
