@@ -1,44 +1,36 @@
 import streamlit as st
-from responder import responder_cliente
-import time  # Para simular el efecto de escritura progresiva
+import requests
 
-st.title("🤖 Chat con el Bot de Meiva Shoes (Ollama)")
+API_URL = "http://138.199.169.157:8006/chat"  # ✅ URL corregida
 
-# Estado para mantener el historial de la conversación
+st.title("🛍️ Asistente Virtual de MEIVA SHOES 👠")
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Mostrar el historial de la conversación
+# Mostrar historial de mensajes
 for msg in st.session_state.messages:
-    role = msg["role"]
-    content = msg["content"]
-    with st.chat_message(role):
-        st.markdown(content)
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-# Entrada del usuario
-user_input = st.chat_input("Escribe tu pregunta:")
+# Input del usuario
+user_input = st.chat_input("¿En qué puedo ayudarte?")
 
-if user_input:
+if user_input := user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    try:
-        # Obtener la respuesta del bot en formato de streaming
-        response_stream = responder_cliente(user_input)  
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        message_placeholder.markdown("...")
 
-        # Contenedor para mostrar la respuesta progresivamente
-        with st.chat_message("assistant"):
-            response_container = st.empty()  
-            full_response = ""
+        # Petición a tu API FastAPI
+        response = requests.post(API_URL, json={"question": user_input})
 
-            for chunk in response_stream:
-                full_response += chunk  # Agregar el fragmento a la respuesta completa
-                response_container.markdown(full_response)  # Actualizar el texto en tiempo real
-                time.sleep(0.05)  # ⚡ Ajusta este tiempo si quieres más o menos velocidad
-
-        # Guardar la respuesta en el historial
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-    except Exception as e:
-        st.error(f"⚠️ Ocurrió un error: {e}")
+        if (response_json := response.json()).get("response"):
+            response_text = response_json["response"]  # ✅ Define response_text
+            message_placeholder.markdown(response_text)
+            st.session_state.messages.append({"role": "assistant", "content": response_text})
+        else:
+            message_placeholder.markdown("⚠️ Lo siento, hubo un problema con la respuesta.")
